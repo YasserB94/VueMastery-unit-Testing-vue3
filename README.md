@@ -1,41 +1,65 @@
 # unit-testing-vue-3
 
-This template should help get you started developing with Vue 3 in Vite.
+My code and notes following along the unit testing for vue 3 tutorial on VueMastery
+I will try to follow along using the newer Vitest and Composition API instead of Jest/Options API. As I like to use 'improved' tools :)
 
-## Recommended IDE Setup
+## What to test ?
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+In short: Components.
 
-## Customize configuration
+Components are the 'units' of a Vue app, we test the building blocks to make sure we can build the house without faulty bricks!
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+### Component contract
 
-## Project Setup
+What is this component's purpose ? What responsibility does it have towards the rest of the codebase ?
+For example:
 
-```sh
-npm install
+```html
+<script setup>
+  import { computed } from "vue";
+  const props = defineProps({
+    maxValue: Number,
+    minValue: Number,
+  });
+  const randomNumber = computed(() => {
+    console.log(props.maxValue);
+    console.log(props.minValue);
+    const max = Math.floor(props.maxValue);
+    const min = Math.ceil(props.minValue);
+    const rand = Math.floor(Math.random() * (max - min) + min);
+    return rand;
+  });
+</script>
+<template>
+  <h3>Random number between {{ props.minValue }} and {{ props.maxValue }}</h3>
+  <p>Your random number is: {{ randomNumber }}</p>
+</template>
 ```
 
-### Compile and Hot-Reload for Development
+So the contract says:
 
-```sh
-npm run dev
-```
+- I expect two props => Input => We test
+- I use those props to generate a random number between them => Calculation => We don't test
+- I will display all three numbers => Output => We test
 
-### Compile and Minify for Production
+So in short, we test **inputs** and **outputs**
+|inputs|outputs|
+|---|---|
+|Component Data|What is rendered to the Dom ?|
+|Props|Calls to external functions|
+|User interaction|Emitted events|
+|Pinia|Updates to Pinia Store|
+|LifeCycle Methods|Changes in Child Components|
+|Route Params||
 
-```sh
-npm run build
-```
+### What not to test ?
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+- Implementation details.
+  - The logic within the code, we test the input and the output!
+- Frameworks
+  - We can trust that the framework we are using (Vue3) is thoroughly tested.
+- External Packages
+  - We use these to make our life easier, and should not test them ourselves.
+    - Tough the data we may compute/receive by using these packages will of course determine the output of our code
 
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+---

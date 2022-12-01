@@ -1,6 +1,9 @@
+<script setup>
+import RandomNumber from "../components/RandomNumber.vue";
+</script>
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <RandomNumber :max-value="50" :min-value="1" />
   </div>
 </template>
 
